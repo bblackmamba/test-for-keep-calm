@@ -18,12 +18,17 @@ export default class ThirdBackTask {
 
             i = i + firstClose;
           } else {
-            const lastClose = str.slice(i + 1).lastIndexOf('}');
+            let open = firstOpen;
+            let close = firstClose;
+            while (open < close && open !== -1) {
+              open = newStr.indexOf('{', open + 1);
+              close = newStr.indexOf('}', close + 1);
+            }
+
             res = res.slice(0, -1);
+            res += parseData(newStr.slice(0, close + 1), parseInt(str[i - 1]));
 
-            res += parseData(newStr.slice(0, lastClose + 1), parseInt(str[i - 1]));
-
-            i = i + lastClose;
+            i = i + close;
           }
         } else if (char === '}') {
         } else {
