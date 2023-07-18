@@ -1,7 +1,7 @@
 import ActionsTypeEnum from './actions-type.enum';
 
 export default class FirstBackTask {
-  static getResult(actions: ActionsTypeEnum[]): number {
+  static getResult(actions: string[]): number {
     if (actions.length < 4) {
       throw new Error('Invalid number of actions: less than 4');
     } else if (actions.length > 49) {
@@ -11,6 +11,7 @@ export default class FirstBackTask {
     let count = 0;
     let sessionStarted = false;
     let connectionEstablished = false;
+    let messageSent = false;
 
     for (let i = 0; i < actions.length; i++) {
       const action = actions[i];
@@ -20,7 +21,7 @@ export default class FirstBackTask {
           sessionStarted = true;
         }
         else {
-          throw new Error('Invalid sequence of commands: "start" command already called');
+          continue;
         }
       }
       else if (action === ActionsTypeEnum.Connect) {
@@ -28,24 +29,26 @@ export default class FirstBackTask {
           connectionEstablished = true;
         }
         else {
-          throw new Error('Invalid sequence of commands: "connect" command called out of order');
+          continue;
         }
       }
       else if (action === ActionsTypeEnum.Message) {
         if (sessionStarted && connectionEstablished) {
-          count++;
+          messageSent = true;
         }
         else {
-          throw new Error('Invalid sequence of commands: "message" command called out of order');
+          continue;
         }
       }
       else if (action === ActionsTypeEnum.End) {
-        if (sessionStarted && connectionEstablished) {
+        if (sessionStarted && connectionEstablished && messageSent) {
+          count++;
           sessionStarted = false;
           connectionEstablished = false;
+          messageSent = false;
         }
         else {
-          throw new Error('Invalid sequence of commands: "end" command called out of order');
+          continue;
         }
       }
       else {
